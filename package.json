@@ -4,14 +4,17 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --mode development",
     "build": "vue-tsc -b && vite build",
     "preview": "vite preview"
   },
   "dependencies": {
+    "vite-plugin-web-extension": "^4.4.3",
     "vue": "^3.5.13"
   },
   "devDependencies": {
+    "@types/chrome": "^0.0.315",
+    "@types/node": "^22.14.1",
     "@vitejs/plugin-vue": "^5.2.1",
     "@vue/tsconfig": "^0.7.0",
     "typescript": "~5.7.2",

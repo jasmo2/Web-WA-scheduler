@@ -17,7 +17,6 @@ window.addEventListener("load", () => {
 
       // Mount the Vue component
       const app = createApp(SchedulerButton, {
-        //@ts-ignore
         iconSrc: chrome.runtime.getURL("icons/icon48.png"),
       })
       app.mount(container)
