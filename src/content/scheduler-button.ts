@@ -3,23 +3,28 @@ import SchedulerButton from "../components/SchedulerButton.vue"
 
 window.addEventListener("load", () => {
   const interval = setInterval(() => {
-    const speechButton = document.querySelector('[data-testid="ptt"]') // WhatsApp's speech button selector
+    const speechButton = document
+      .querySelector('[data-icon="ptt"]')!
+      .closest("button")
+
+    console.log("TCL ~ interval ~ speechButton:", speechButton)
     if (speechButton) {
       clearInterval(interval)
 
-      // Create a container for the Vue component
       const container = document.createElement("div")
       container.style.display = "inline-block"
-      speechButton.parentElement!.insertBefore(
-        container,
-        speechButton.nextSibling
-      )
+      container.style.marginLeft = "8px" // Add spacing between the buttons
+
+      // Insert the container next to the speech button
+      speechButton.parentElement?.appendChild(container)
 
       // Mount the Vue component
       const app = createApp(SchedulerButton, {
-        iconSrc: chrome.runtime.getURL("icons/icon48.png"),
+        iconSrc: chrome.runtime.getURL("./src/assets/calendar.svg"),
       })
       app.mount(container)
+
+      console.log("TCL Scheduler button added successfully!")
     }
   }, 500)
 })

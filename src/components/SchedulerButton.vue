@@ -1,5 +1,5 @@
 <template>
-  <button class="custom-button" @click="handleClick" title="Schedule a message">
+  <button class="scheduler-button" @click="handleClick" title="Schedule a message">
     <img :src="iconSrc" alt="Schedule" />
   </button>
 </template>
@@ -16,15 +16,15 @@ export default defineComponent({
   },
   methods: {
     handleClick() {
-      alert("Custom button clicked!");
-      // Add scheduling logic here
+      console.log("Scheduler button clicked!");
+      alert("Scheduler button clicked!");
     },
   },
 });
 </script>
 
 <style scoped>
-.custom-button {
+.scheduler-button {
   background: none;
   border: none;
   cursor: pointer;
@@ -32,7 +32,7 @@ export default defineComponent({
   height: 24px;
   padding: 0;
 }
-.custom-button img {
+.scheduler-button img {
   width: 100%;
   height: 100%;
   object-fit: contain;
