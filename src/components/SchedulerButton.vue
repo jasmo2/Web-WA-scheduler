@@ -14,7 +14,6 @@
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
-import CalendarSvg from '../assets/calendar.svg?component'
 import CalendarSvgRAW from '../assets/calendar.svg?raw'
 
 import CalendarView from "./CalendarView.vue";
@@ -24,9 +23,6 @@ export default defineComponent({
     CalendarView
   },
   props: {},
-  mounted(){
-      console.log("CalendarSvg imported:", CalendarSvg, "CalendarSvgRAW: ", CalendarSvgRAW);
-  },
   setup() {
     const showCalendar = ref(false);
     const currentRecipient = ref("Notes");

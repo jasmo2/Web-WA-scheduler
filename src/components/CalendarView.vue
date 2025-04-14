@@ -10,13 +10,6 @@
         <div class="date-picker">
           <div id="vanilla-calendar"></div>
         </div>
-        
-        <div class="time-picker">
-          <label>Send Time</label>
-          <div class="time-input">
-            <input type="time" v-model="selectedTime" />
-          </div>
-        </div>
       </div>
       
       <div class="message-input">
@@ -101,6 +94,7 @@ export default defineComponent({
 
 <style scoped>
 .calendar-modal {
+  --message-input-padding: 16px;
   position: fixed;
   top: 0;
   left: 0;
@@ -150,18 +144,6 @@ export default defineComponent({
   flex: 3;
 }
 
-.time-picker {
-  flex: 1;
-  padding-left: 16px;
-  display: flex;
-  flex-direction: column;
-}
-
-.time-picker label {
-  margin-bottom: 8px;
-  color: #8696a0;
-}
-
 .time-input {
   margin-top: 8px;
 }
@@ -174,7 +156,7 @@ export default defineComponent({
 }
 
 .message-input {
-  padding: 16px;
+  padding: var(--message-input-padding);
   border-top: 1px solid #e0e0e0;
 }
 
@@ -197,7 +179,7 @@ export default defineComponent({
 }
 
 textarea {
-  width: 100%;
+  width: calc(100% - var(--message-input-padding));
   height: 100px;
   padding: 8px;
   border: 1px solid #e0e0e0;
