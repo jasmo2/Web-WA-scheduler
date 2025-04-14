@@ -19,9 +19,7 @@ window.addEventListener("load", () => {
       speechButton.parentElement?.appendChild(container)
 
       // Mount the Vue component
-      const app = createApp(SchedulerButton, {
-        iconSrc: chrome.runtime.getURL("./src/assets/calendar.svg"),
-      })
+      const app = createApp(SchedulerButton)
       app.mount(container)
 
       console.log("TCL Scheduler button added successfully!")

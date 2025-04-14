@@ -1,6 +1,6 @@
 <template>
   <button class="scheduler-button" @click="handleClick" title="Schedule a message">
-    <img :src="iconSrc" alt="Schedule" />
+    <img src="../assets/calendar.svg" alt="Schedule" />
   </button>
 </template>
 
@@ -8,12 +8,7 @@
 import { defineComponent } from "vue";
 
 export default defineComponent({
-  props: {
-    iconSrc: {
-      type: String,
-      required: true,
-    },
-  },
+  props: {},
   methods: {
     handleClick() {
       console.log("Scheduler button clicked!");
