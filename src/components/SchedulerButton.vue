@@ -1,24 +1,69 @@
 <template>
   <button class="scheduler-button" @click="handleClick" title="Schedule a message">
-    <img src="../assets/calendar.svg" alt="Schedule" />
+    <div v-html="CalendarSvgRAW"></div>
   </button>
+
+  <!-- Mount the calendar modal when shown -->
+  <Teleport to="body" v-if="showCalendar">
+    <CalendarView 
+      :recipient="currentRecipient" 
+      @close="showCalendar = false" 
+    />
+  </Teleport>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, ref } from "vue";
+import CalendarSvg from '../assets/calendar.svg?component'
+import CalendarSvgRAW from '../assets/calendar.svg?raw'
+
+import CalendarView from "./CalendarView.vue";
 
 export default defineComponent({
-  props: {},
-  methods: {
-    handleClick() {
-      console.log("Scheduler button clicked!");
-      alert("Scheduler button clicked!");
-    },
+  components: {
+    CalendarView
   },
+  props: {},
+  mounted(){
+      console.log("CalendarSvg imported:", CalendarSvg, "CalendarSvgRAW: ", CalendarSvgRAW);
+  },
+  setup() {
+    const showCalendar = ref(false);
+    const currentRecipient = ref("Notes");
+
+
+
+    const handleClick = () => {
+      console.log("Scheduler button clicked!");
+      
+      // Get current chat name if possible
+      try {
+        const headerElement = document.querySelector('[data-testid="conversation-header"] [role="heading"]');
+        if (headerElement) {
+          currentRecipient.value = headerElement.textContent || "Notes";
+        }
+      } catch (error) {
+        console.error("Error getting chat name:", error);
+      }
+      
+      // Show calendar modal
+      showCalendar.value = true;
+    };
+
+    return {
+      CalendarSvgRAW,
+      currentRecipient,
+      handleClick,
+      showCalendar,
+    };
+  }
 });
 </script>
 
 <style scoped>
+:root {
+  color-scheme: light dark;
+}
 .scheduler-button {
   background: none;
   border: none;
@@ -31,5 +76,10 @@ export default defineComponent({
   width: 100%;
   height: 100%;
   object-fit: contain;
+}
+.scheduler-button :deep(svg) {
+  height: 24px;
+  stroke: light-dark(#54656f, #8896a0); /* WhatsApp's icon color */
+  width: 24px;
 }
 </style>

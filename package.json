@@ -4,12 +4,12 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --mode development",
-    "build:watch": "vite build --watch --mode development",
+    "dev": "vite build --watch --mode development",
     "build": "vue-tsc -b && vite build",
     "preview": "vite preview"
   },
   "dependencies": {
+    "vanilla-calendar-pro": "^3.0.3",
     "vite-plugin-web-extension": "^4.4.3",
     "vue": "^3.5.13"
   },
@@ -18,8 +18,10 @@
     "@types/node": "^22.14.1",
     "@vitejs/plugin-vue": "^5.2.1",
     "@vue/tsconfig": "^0.7.0",
+    "hot-reload-extension-vite": "^1.0.13",
     "typescript": "~5.7.2",
     "vite": "^6.2.0",
+    "vite-svg-loader": "^5.1.0",
     "vue-tsc": "^2.2.4"
   }
 }

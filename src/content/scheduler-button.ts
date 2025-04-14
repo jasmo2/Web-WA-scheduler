@@ -4,10 +4,9 @@ import SchedulerButton from "../components/SchedulerButton.vue"
 window.addEventListener("load", () => {
   const interval = setInterval(() => {
     const speechButton = document
-      .querySelector('[data-icon="ptt"]')!
-      .closest("button")
+      .querySelector('[data-icon="ptt"]')
+      ?.closest("button")
 
-    console.log("TCL ~ interval ~ speechButton:", speechButton)
     if (speechButton) {
       clearInterval(interval)
 
@@ -20,9 +19,11 @@ window.addEventListener("load", () => {
 
       // Mount the Vue component
       const app = createApp(SchedulerButton)
-      app.mount(container)
 
-      console.log("TCL Scheduler button added successfully!")
+      // Make sure to inject the Chrome extension API
+      app.config.globalProperties.$chrome = chrome
+
+      app.mount(container)
     }
   }, 500)
 })
