@@ -1,37 +1,41 @@
 <template>
-  <div class="calendar-modal">
-    <div class="calendar-modal-content">
-      <div class="calendar-header">
-        <h3>Schedule a message to {{ recipient }}</h3>
-        <button class="close-button" @click="closeModal">&times;</button>
+  <div class="calendar-overlay" @click.self="$emit('close')">
+    <div class="calendar-modal">
+      <div class="modal-header">
+        <h3>Schedule a Message to {{ recipient }}</h3>
+        <button class="close-button" @click="$emit('close')">×</button>
       </div>
       
       <div class="calendar-container">
         <div class="date-picker">
-          <div id="vanilla-calendar"></div>
+          <div ref="calendarContainer"></div>
         </div>
       </div>
       
       <div class="message-input">
-        <div class="formatting-toolbar">
-          <button class="bold-btn">B</button>
-          <button class="italic-btn">I</button>
-          <button class="strikethrough-btn">S</button>
-          <button class="emoji-btn">😊</button>
-          <!-- <button class="attach-btn">📎 Add files</button> -->
-        </div>
-        <textarea placeholder="Type a message" v-model="message"></textarea>
+        <textarea 
+          v-model="messageText" 
+          placeholder="Type your message here..."
+          rows="4"
+        ></textarea>
       </div>
       
       <div class="action-buttons">
-        <button class="schedule-btn" @click="scheduleMessage">Schedule Msg</button>
+        <button class="cancel-button" @click="$emit('close')">Cancel</button>
+        <button 
+          class="schedule-button" 
+          :disabled="!messageText.trim() || isScheduling" 
+          @click="scheduleMessage"
+        >
+          {{ isScheduling ? 'Scheduling...' : 'Schedule Message' }}
+        </button>
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref } from 'vue';
+import { defineComponent, ref, onMounted, onUnmounted } from 'vue';
 import { Calendar, type Options } from 'vanilla-calendar-pro';
 import 'vanilla-calendar-pro/styles/index.css';
 
@@ -42,51 +46,82 @@ const CalenderOptions: Options = {
 }
 
 export default defineComponent({
+  name: 'CalendarView',
   props: {
     recipient: {
       type: String,
-      default: ''
+      required: true
     }
   },
-  emits: ['close'],
   setup(props, { emit }) {
-    const selectedDate = ref(new Date());
-    const selectedTime = ref('12:12');
-    const message = ref('');
+    const calendarContainer = ref<HTMLElement | null>(null);
+    const selectedDate = ref<Date | null>(null);
+    const selectedTime = ref('12:00');
+    const messageText = ref('');
+    const isScheduling = ref(false);
     let calendar: any = null;
 
     onMounted(() => {
       // Initialize the calendar
-      calendar = new Calendar('#vanilla-calendar', CalenderOptions);
+      calendar = new Calendar(calendarContainer.value!, CalenderOptions);
       calendar.init();
     });
 
-    const closeModal = () => {
-      emit('close');
-    };
+    onUnmounted(() => {
+      if (calendar) {
+        calendar.destroy();
+      }
+    });
 
-    const scheduleMessage = () => {
-      // Combine date and time
-      const scheduledDate = new Date(selectedDate.value);
-      const [hours, minutes] = selectedTime.value.split(':').map(Number);
-      scheduledDate.setHours(hours, minutes);
+    const scheduleMessage = async () => {
+      if (!selectedDate.value || !messageText.value.trim()) return;
       
-      console.log('Scheduling message:', {
-        recipient: props.recipient,
-        message: message.value,
-        scheduledTime: scheduledDate
-      });
-      
-      // In a real implementation, you would send this to a background script
-      alert(`Message scheduled for ${scheduledDate.toLocaleString()}`);
-      closeModal();
+      try {
+        isScheduling.value = true;
+        
+        // Combine date and time
+        const [hours, minutes] = selectedTime.value.split(':').map(Number);
+        const scheduledDateTime = new Date(selectedDate.value);
+        scheduledDateTime.setHours(hours, minutes, 0, 0);
+        
+        // Ensure the scheduled time is in the future
+        const now = new Date();
+        if (scheduledDateTime <= now) {
+          alert('Please select a future date and time.');
+          isScheduling.value = false;
+          return;
+        }
+        
+        // Send the scheduling request to the background script
+        const response = await chrome.runtime.sendMessage({
+          action: 'scheduleMessage',
+          data: {
+            recipient: props.recipient,
+            message: messageText.value,
+            scheduledTime: scheduledDateTime.getTime()
+          }
+        });
+        
+        if (response.success) {
+          alert(`Message scheduled for ${scheduledDateTime.toLocaleString()}`);
+          emit('close');
+        } else {
+          throw new Error(response.error || 'Failed to schedule message');
+        }
+      } catch (error) {
+        console.error('Error scheduling message:', error);
+        alert(`Failed to schedule message: ${(error as Error).message}`);
+      } finally {
+        isScheduling.value = false;
+      }
     };
 
     return {
+      calendarContainer,
+      isScheduling,
+      messageText,
+      scheduleMessage,
       selectedTime,
-      message,
-      closeModal,
-      scheduleMessage
     };
   }
 });
