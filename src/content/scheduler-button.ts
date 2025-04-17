@@ -6,8 +6,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "sendScheduledMessage") {
     sendWhatsAppMessage(request.data)
       .then(() => sendResponse({ success: true }))
-      .catch((error) => sendResponse({ success: false, error: error.message }))
-    return true // Keep the message channel open for async response
+      .catch((error: { message: any }) =>
+        sendResponse({ success: false, error: error.message })
+      )
+    return true
   }
 })
 
@@ -17,68 +19,82 @@ interface MessageData {
 }
 
 // Function to send a WhatsApp message
-async function sendWhatsAppMessage({ recipient, message }: MessageData) {
+function sendWhatsAppMessage({ recipient, message }: MessageData) {
   console.log(`Sending scheduled message to ${recipient}`)
 
-  // Step 1: Search for the recipient
-  const searchBox = document.querySelector(
-    'div[data-testid="chat-list-search"]'
-  ) as HTMLElement
-  if (!searchBox) throw new Error("Search box not found")
+  try {
+    // Step 1: Find the search box in the side panel
+    // Find the search input in different ways (WhatsApp Web changes its structure often)
+    let searchInput: HTMLElement | null = document.querySelector(
+      '#side div[contenteditable="true"]'
+    )
+    if (!searchInput) throw new Error("Side searchInput panel not found")
 
-  searchBox.click()
+    // Clear any existing text
+    searchInput.textContent = ""
+    searchInput.focus()
 
-  // Find the input within the search container
-  const searchInput = document.querySelector(
-    'div[data-testid="chat-list-search"] div[contenteditable="true"]'
-  ) as HTMLElement
-  if (!searchInput) throw new Error("Search input not found")
+    // Insert the recipient name
+    document.execCommand("insertText", false, recipient)
+    searchInput.dispatchEvent(new Event("change", { bubbles: true }))
 
-  // Clear any existing text
-  searchInput.textContent = ""
-  searchInput.focus()
+    // Step 2: Click on the first chat result (try multiple selectors)
+    const contactToBeClick = document.querySelector(
+      '#pane-side div[role="listitem"]:nth-of-type(2)'
+    )
 
-  // Insert the recipient name
-  document.execCommand("insertText", false, recipient)
-  searchInput.dispatchEvent(new Event("change", { bubbles: true }))
+    if (!contactToBeClick) throw new Error("chatResult person not found")
 
-  // Wait for search results
-  await new Promise((resolve) => setTimeout(resolve, 1000))
+    // Step 3: Find the main chat area
+    const main = document.querySelector("#main")
+    if (!main) throw new Error("Main chat area not found")
 
-  // Step 2: Click on the first chat result
-  const chatResult = document.querySelector(
-    'div[data-testid="cell-frame-title"]'
-  ) as HTMLElement
-  if (!chatResult) throw new Error("Chat not found for recipient: " + recipient)
+    // Find the message input - try multiple selectors
+    let messageInput: HTMLElement | null = main.querySelector(
+      'div[contenteditable="true"]'
+    )
+    if (!messageInput) throw new Error("messageInput chat area not found")
 
-  chatResult.click()
+    setTimeout(() => {
+      const sendButton =
+        main.querySelector(`[data-testid="send"]`) ||
+        main.querySelector(`[data-icon="send"]`)
 
-  // Wait for chat to load
-  await new Promise((resolve) => setTimeout(resolve, 500))
+      if (sendButton) {
+        ;(sendButton as HTMLElement).click()
+      }
+    }, 100)
 
-  // Step 3: Type and send the message
-  const messageInput = document.querySelector(
-    'div[data-testid="conversation-compose-box-input"]'
-  ) as HTMLElement
-  if (!messageInput) throw new Error("Message input not found")
+    messageInput.focus()
+    document.execCommand("insertText", false, message)
+    messageInput.dispatchEvent(new Event("change", { bubbles: true }))
+    messageInput.dispatchEvent(new Event("input", { bubbles: true }))
 
-  messageInput.focus()
-  document.execCommand("insertText", false, message)
-  messageInput.dispatchEvent(new Event("change", { bubbles: true }))
+    // Find and click send button
+    let sendButton: HTMLElement | null = document.querySelector(
+      'button[data-testid="compose-btn-send"]'
+    )
 
-  // Wait for the message to be typed
-  await new Promise((resolve) => setTimeout(resolve, 300))
+    if (!sendButton) {
+      sendButton = main.querySelector('button[data-icon="send"]')
 
-  // Send the message
-  const sendButton = document.querySelector(
-    'button[data-testid="compose-btn-send"]'
-  ) as HTMLElement
-  if (!sendButton) throw new Error("Send button not found")
+      if (!sendButton) {
+        sendButton = document.querySelector("button.send-button")
 
-  sendButton.click()
-  console.log("Message sent successfully!")
+        if (!sendButton) {
+          throw new Error("Send button not found")
+        }
+      }
+    }
 
-  return true
+    sendButton.click()
+    console.log("Message sent successfully!")
+
+    return Promise.resolve(true)
+  } catch (error) {
+    console.error("Failed to send WhatsApp message:", error)
+    return Promise.reject(error)
+  }
 }
 
 window.addEventListener("load", () => {
