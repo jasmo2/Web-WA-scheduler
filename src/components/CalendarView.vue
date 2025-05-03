@@ -1,27 +1,35 @@
 <template>
-  <div class="calendar-overlay" @click="$emit('close')">
-    <div class="calendar-modal" @click.stop>
+  <dialog open class="calendar-overlay" @click="$emit('close')">
+    <article class="calendar-modal" @click.stop>
       <div class="calendar-wrapper">
-        <div class="modal-header">
-          <h3>Schedule a Message to {{ recipient }}</h3>
-          <button class="close-button" @click="$emit('close')">×</button>
-        </div>
+        <header class="modal-header">
+          <h2>Schedule a Message to {{ recipient }}</h2>
+          <button
+            class="close-button"
+            aria-label="Close"
+            @click="$emit('close')"
+          >
+            ×
+          </button>
+        </header>
 
-        <div class="calendar-container">
-          <div class="date-picker">
-            <div ref="calendarContainer"></div>
-          </div>
-        </div>
+        <main class="calendar-container">
+          <section ref="calendarContainer"></section>
+        </main>
+
         <aside class="calendar-controls">
-          <div class="message-input">
+          <section class="message-input">
+            <label for="message-textarea" class="sr-only">Message</label>
             <textarea
+              id="message-textarea"
               v-model="messageText"
               placeholder="Type your message here..."
               rows="4"
+              aria-label="Your message"
             ></textarea>
-          </div>
+          </section>
 
-          <div class="action-buttons">
+          <footer class="action-buttons">
             <button class="cancel-button" @click="$emit('close')">
               Cancel
             </button>
@@ -29,14 +37,15 @@
               class="schedule-button"
               :disabled="!messageText.trim() || isScheduling"
               @click="scheduleMessage"
+              :aria-busy="isScheduling"
             >
               {{ isScheduling ? "Scheduling..." : "Schedule Message" }}
             </button>
-          </div>
+          </footer>
         </aside>
       </div>
-    </div>
-  </div>
+    </article>
+  </dialog>
 </template>
 
 <script lang="ts">
@@ -144,6 +153,9 @@ export default defineComponent({
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  margin: 0;
+  padding: 0;
+  border: none;
 }
 
 .calendar-modal {
@@ -191,7 +203,7 @@ export default defineComponent({
   grid-area: 1 / 1 / 2 / 6;
 }
 
-.modal-header h3 {
+.modal-header h2 {
   margin: 0;
   color: #41525d;
   font-size: 18px;
@@ -202,11 +214,6 @@ export default defineComponent({
   display: flex;
   flex-direction: column;
   gap: 16px;
-}
-
-.date-picker {
-  display: flex;
-  justify-content: center;
 }
 
 .calendar-controls {
@@ -334,5 +341,17 @@ textarea {
   width: 100%;
   max-width: 350px;
   margin: 0 auto;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
 }
 </style>
