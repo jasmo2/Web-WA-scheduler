@@ -1,6 +1,6 @@
 <template>
-  <div class="calendar-overlay" @click.self="$emit('close')">
-    <div class="calendar-modal">
+  <div class="calendar-overlay" @click="$emit('close')">
+    <div class="calendar-modal" @click.stop>
       <div class="calendar-wrapper">
         <div class="modal-header">
           <h3>Schedule a Message to {{ recipient }}</h3>
@@ -134,23 +134,29 @@ export default defineComponent({
 
 <style scoped>
 .calendar-overlay {
-  z-index: 100;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
 }
+
 .calendar-modal {
   --light-gray: #e0e0e0;
   --calendar-padding: 8px;
   --calendar-padding-x2: calc(var(--calendar-padding) * 2);
   --tint-green: #00a884;
-  align-items: center;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  height: 100%;
-  justify-content: center;
-  left: 0;
-  position: fixed;
-  top: 0;
-  width: 100%;
-  z-index: 101;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1001;
+  max-width: 90vw;
+  max-height: 90vh;
 }
 
 .calendar-wrapper {
