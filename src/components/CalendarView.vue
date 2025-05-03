@@ -273,17 +273,6 @@ export default defineComponent({
   grid-area: 2 / 1 / 6 / 3;
 }
 
-.time-input {
-  margin-top: 8px;
-}
-
-.time-input input {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid var(#e0e0e0);
-  border-radius: 4px;
-}
-
 .message-input {
   border-top: 1px solid var(#e0e0e0);
   flex: 7;
