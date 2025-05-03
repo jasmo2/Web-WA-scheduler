@@ -49,15 +49,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, onUnmounted } from "vue"
+import { defineComponent, ref, onMounted, onUnmounted, computed } from "vue"
 import { Calendar, type Options } from "vanilla-calendar-pro"
 import "vanilla-calendar-pro/styles/index.css"
-
-const CalenderOptions: Options = {
-  dateMin: "today",
-  type: "default",
-  selectionTimeMode: 24,
-}
 
 export default defineComponent({
   name: "CalendarView",
@@ -68,12 +62,31 @@ export default defineComponent({
     },
   },
   setup(props, { emit }) {
+    const CalenderOptions: Options = {
+      dateMin: "today",
+      type: "default",
+      selectionTimeMode: 24,
+      onClickDate(self) {
+        setTimeAndDate(self)
+      },
+      onChangeTime(self) {
+        setTimeAndDate(self)
+      },
+    }
     const calendarContainer = ref<HTMLElement | null>(null)
-    const selectedDate = ref<Date | null>(null)
+    const selectedDate = ref<Date | number | string | null>(null)
     const selectedTime = ref("12:00")
     const messageText = ref("")
     const isScheduling = ref(false)
+    selectedTime
     let calendar: any = null
+    function setTimeAndDate(calendar: Calendar) {
+      const sTime = calendar.context.selectedTime
+      const sDate = calendar.context.selectedDates[0]
+
+      selectedDate.value = sDate
+      selectedTime.value = sTime
+    }
 
     onMounted(() => {
       // Initialize the calendar
