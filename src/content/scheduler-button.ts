@@ -77,29 +77,32 @@ async function sendWhatsAppMessage({ recipient, message }: MessageData) {
   }
 }
 
-window.addEventListener("load", () => {
-  const interval = setInterval(() => {
-    const speechButton = document
-      .querySelector('[data-icon="ptt"]')
-      ?.closest("button")
+const observer = new MutationObserver(() => {
+  const speechButton = document
+    .querySelector('[data-icon="ptt"]')
+    ?.closest("button")
 
-    if (speechButton) {
-      clearInterval(interval)
+  if (
+    speechButton &&
+    !speechButton.parentElement?.querySelector(".scheduler-container")
+  ) {
+    const container = document.createElement("div")
+    container.className = "scheduler-container" // Add a class to avoid duplicate injections
+    container.style.display = "inline-block"
+    container.style.marginLeft = "8px" // Add spacing between the buttons
 
-      const container = document.createElement("div")
-      container.style.display = "inline-block"
-      container.style.marginLeft = "8px" // Add spacing between the buttons
+    // Insert the container next to the speech button
+    speechButton.parentElement?.appendChild(container)
 
-      // Insert the container next to the speech button
-      speechButton.parentElement?.appendChild(container)
+    // Mount the Vue component
+    const app = createApp(SchedulerButton)
 
-      // Mount the Vue component
-      const app = createApp(SchedulerButton)
+    // Make sure to inject the Chrome extension API
+    app.config.globalProperties.$chrome = chrome
 
-      // Make sure to inject the Chrome extension API
-      app.config.globalProperties.$chrome = chrome
-
-      app.mount(container)
-    }
-  }, 500)
+    app.mount(container)
+  }
 })
+
+// Start observing the DOM for changes
+observer.observe(document.body, { childList: true, subtree: true })
