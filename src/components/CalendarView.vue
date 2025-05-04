@@ -53,6 +53,25 @@ import { defineComponent, ref, onMounted, onUnmounted } from "vue"
 import { Calendar, type Options } from "vanilla-calendar-pro"
 import "vanilla-calendar-pro/styles/index.css"
 
+function createInitialDate(daysOffset = 0) {
+  // Create a date with the specified offset
+  const now = new Date()
+  const targetDate = new Date(now)
+  targetDate.setDate(now.getDate() + daysOffset)
+
+  // Format as YYYY-MM-DD
+  const year = targetDate.getFullYear()
+  const month = String(targetDate.getMonth() + 1).padStart(2, "0") // months are 0-indexed
+  const day = String(targetDate.getDate()).padStart(2, "0")
+
+  // For single date selection
+  const formattedDate = `${year}-${month}-${day}`
+
+  // You could also return a date range like this:
+  // return [`${year}-${month}-${day}`, `${year}-${month}-${Number(day) + 5}`];
+
+  return formattedDate
+}
 function createInitialTime(offset = 0) {
   const now = new Date()
   const futureTime = new Date(now.getTime() + offset * 60 * 1000)
@@ -82,11 +101,13 @@ export default defineComponent({
   },
   setup(props, { emit }) {
     const initTime = createInitialTime(1)
+    const initDate = createInitialDate()
     const CalenderOptions: Options = {
       dateMin: "today",
       type: "default",
       selectionTimeMode: 12,
       selectedTime: initTime,
+      selectedDates: [initDate],
       onClickDate(self) {
         setTimeAndDate(self)
       },
@@ -95,8 +116,8 @@ export default defineComponent({
       },
     }
     const calendarContainer = ref<HTMLElement | null>(null)
-    const selectedDate = ref<Date | number | string | null>(null)
-    const selectedTime = ref("12:00")
+    const selectedDate = ref<Date | number | string | null>(initDate)
+    const selectedTime = ref(initTime)
     const messageText = ref("")
     const isScheduling = ref(false)
     selectedTime
