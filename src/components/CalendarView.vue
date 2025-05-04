@@ -49,9 +49,28 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, onUnmounted, computed } from "vue"
+import { defineComponent, ref, onMounted, onUnmounted } from "vue"
 import { Calendar, type Options } from "vanilla-calendar-pro"
 import "vanilla-calendar-pro/styles/index.css"
+
+function createInitialTime(offset = 0) {
+  const now = new Date()
+  const futureTime = new Date(now.getTime() + offset * 60 * 1000)
+
+  // For 24-hour format (current implementation)
+  const minutes = String(futureTime.getMinutes()).padStart(2, "0")
+
+  // For 12-hour format with AM/PM
+  let hours12 = futureTime.getHours() % 12
+  hours12 = hours12 === 0 ? 12 : hours12
+  const period = futureTime.getHours() >= 12 ? "PM" : "AM"
+  const time12 = `${String(hours12).padStart(2, "0")}:${minutes} ${period}`
+
+  // Return the appropriate format based on selectionTimeMode
+  // If using selectionTimeMode: 24, return time24
+  // If using selectionTimeMode: 12, return time12
+  return time12 // Or time12 if you switch to 12-hour mode
+}
 
 export default defineComponent({
   name: "CalendarView",
@@ -62,10 +81,12 @@ export default defineComponent({
     },
   },
   setup(props, { emit }) {
+    const initTime = createInitialTime(1)
     const CalenderOptions: Options = {
       dateMin: "today",
       type: "default",
-      selectionTimeMode: 24,
+      selectionTimeMode: 12,
+      selectedTime: initTime,
       onClickDate(self) {
         setTimeAndDate(self)
       },
