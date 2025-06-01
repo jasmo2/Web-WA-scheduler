@@ -5,12 +5,8 @@ import {
   type ScheduledMessage,
 } from "../utils/storage"
 
-console.log("TCL WhatsApp Scheduler Background Service Worker Started!")
-
 // Set up alarm handler
 chrome.alarms.onAlarm.addListener(async (alarm) => {
-  console.log("TCL Alarm triggered:", alarm.name)
-
   if (alarm.name.startsWith("scheduled-message-")) {
     const messageId = alarm.name.replace("scheduled-message-", "")
     await processScheduledMessage(messageId)
@@ -30,10 +26,6 @@ async function scheduleMessage(
   sendResponse: (response?: any) => void
 ) {
   try {
-    // Schedule the alarm
-    const scheduledTime = new Date(data.scheduledTime)
-    console.log(`TCL Scheduling message for ${scheduledTime.toLocaleString()}`)
-
     // Save to storage
     const savedMessage = await saveScheduledMessage({
       recipient: data.recipient,
@@ -119,7 +111,6 @@ async function checkMissedSchedules() {
     if (message.status === "pending") {
       if (message.scheduledTime <= now) {
         // Message was missed, send it now
-        console.log("TCL ~ Processing missed scheduled message:", message)
         await processScheduledMessage(message.id)
       } else {
         // Message is still in the future, schedule alarm

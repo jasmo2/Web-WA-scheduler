@@ -102,6 +102,7 @@ export default defineComponent({
   setup(props, { emit }) {
     const initTime = createInitialTime(1)
     const initDate = createInitialDate()
+
     const CalenderOptions: Options = {
       dateMin: "today",
       type: "default",
@@ -141,7 +142,6 @@ export default defineComponent({
         calendar.destroy()
       }
     })
-
     const scheduleMessage = async () => {
       if (!selectedDate.value || !messageText.value.trim()) return
 
@@ -169,27 +169,29 @@ export default defineComponent({
           hours += 12 // 1:xx PM becomes 13:xx, but 12:xx PM stays 12:xx
         }
 
-        // Combine date and time
-        const scheduledDateTime = new Date(selectedDate.value)
-        scheduledDateTime.setHours(hours, minutes, 0, 0)
+        // Combine date and time - Fix potential timezone issues
+        let scheduledDateTime: Date
 
-        console.log("TCL ~ Parsed time:", {
-          original: selectedTime.value,
-          hours,
-          minutes,
-          period,
-          scheduledDateTime: scheduledDateTime.toLocaleString(),
-        })
+        if (typeof selectedDate.value === "string") {
+          // If it's a string like "2025-06-01", create date in local timezone
+          const dateParts = selectedDate.value.split("-")
+          if (dateParts.length === 3) {
+            const year = parseInt(dateParts[0], 10)
+            const month = parseInt(dateParts[1], 10) - 1 // Month is 0-indexed
+            const day = parseInt(dateParts[2], 10)
+            scheduledDateTime = new Date(year, month, day)
+          } else {
+            scheduledDateTime = new Date(selectedDate.value)
+          }
+        } else {
+          scheduledDateTime = new Date(selectedDate.value)
+        }
+
+        scheduledDateTime.setHours(hours, minutes, 0, 0)
 
         // Ensure the scheduled time is in the future
         const now = new Date()
         if (scheduledDateTime <= now) {
-          console.log(
-            "TCL ~ scheduleMessage ~ scheduledDateTime:",
-            scheduledDateTime,
-            "now",
-            now
-          )
           alert("Please select a future date and time.")
           isScheduling.value = false
           return
@@ -205,7 +207,6 @@ export default defineComponent({
           },
         })
 
-        console.log("TCL ~ Schedule response:", response)
         if (response.success) {
           alert(`Message scheduled for ${scheduledDateTime.toLocaleString()}`)
           emit("close")
