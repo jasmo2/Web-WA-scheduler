@@ -32,18 +32,18 @@ export default defineComponent({
       // Get current chat name if possible
       try {
         const headerElement = document.querySelector(
-          '[data-testid="conversation-header"] [role="heading"]'
+          "#main > header > div > div > div"
         )
         if (headerElement) {
           currentRecipient.value = headerElement.textContent || "Notes"
+          console.log("TCL ~ Found chat name:", currentRecipient.value)
         } else {
-          console.error(
-            "TCL ~ No header element found, using default recipient"
-          )
           console.log("TCL ~ No header element found, using default recipient")
+          currentRecipient.value = "Notes"
         }
       } catch (error) {
-        console.error("Error getting chat name:", error)
+        console.log("TCL ~ Error getting chat name:", error)
+        currentRecipient.value = "Notes"
       }
 
       // Show calendar modal

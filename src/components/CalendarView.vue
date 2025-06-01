@@ -172,6 +172,9 @@ export default defineComponent({
         // Combine date and time - Fix potential timezone issues
         let scheduledDateTime: Date
 
+        console.log("TCL ~ Selected date value:", selectedDate.value)
+        console.log("TCL ~ Selected time value:", selectedTime.value)
+
         if (typeof selectedDate.value === "string") {
           // If it's a string like "2025-06-01", create date in local timezone
           const dateParts = selectedDate.value.split("-")
@@ -180,14 +183,32 @@ export default defineComponent({
             const month = parseInt(dateParts[1], 10) - 1 // Month is 0-indexed
             const day = parseInt(dateParts[2], 10)
             scheduledDateTime = new Date(year, month, day)
+            console.log("TCL ~ Created date from parts:", {
+              year,
+              month: month + 1,
+              day,
+            })
           } else {
             scheduledDateTime = new Date(selectedDate.value)
+            console.log("TCL ~ Created date from string:", selectedDate.value)
           }
         } else {
           scheduledDateTime = new Date(selectedDate.value)
+          console.log(
+            "TCL ~ Created date from date object:",
+            selectedDate.value
+          )
         }
 
         scheduledDateTime.setHours(hours, minutes, 0, 0)
+        console.log(
+          "TCL ~ Final scheduled datetime:",
+          scheduledDateTime.toLocaleString()
+        )
+        console.log(
+          "TCL ~ Final scheduled timestamp:",
+          scheduledDateTime.getTime()
+        )
 
         // Ensure the scheduled time is in the future
         const now = new Date()
