@@ -119,7 +119,7 @@ async function checkMissedSchedules() {
     if (message.status === "pending") {
       if (message.scheduledTime <= now) {
         // Message was missed, send it now
-        console.log("Processing missed scheduled message:", message)
+        console.log("TCL ~ Processing missed scheduled message:", message)
         await processScheduledMessage(message.id)
       } else {
         // Message is still in the future, schedule alarm

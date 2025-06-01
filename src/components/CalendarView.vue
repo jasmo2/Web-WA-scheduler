@@ -173,7 +173,7 @@ export default defineComponent({
         const scheduledDateTime = new Date(selectedDate.value)
         scheduledDateTime.setHours(hours, minutes, 0, 0)
 
-        console.log("Parsed time:", {
+        console.log("TCL ~ Parsed time:", {
           original: selectedTime.value,
           hours,
           minutes,
@@ -205,7 +205,7 @@ export default defineComponent({
           },
         })
 
-        console.log("Schedule response:", response)
+        console.log("TCL ~ Schedule response:", response)
         if (response.success) {
           alert(`Message scheduled for ${scheduledDateTime.toLocaleString()}`)
           emit("close")

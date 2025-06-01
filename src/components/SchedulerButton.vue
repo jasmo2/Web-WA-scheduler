@@ -29,10 +29,10 @@ export default defineComponent({
     const currentRecipient = ref("Notes")
 
     const handleClick = () => {
-      console.log("Scheduler button clicked!!")
-      console.log("Current URL:", window.location.href)
+      console.log("TCL ~ Scheduler button clicked!!")
+      console.log("TCL ~ Current URL:", window.location.href)
       console.log(
-        "Extension context:",
+        "TCL ~ Extension context:",
         chrome?.runtime?.id ? "Available" : "Not available"
       )
 
@@ -43,9 +43,9 @@ export default defineComponent({
         )
         if (headerElement) {
           currentRecipient.value = headerElement.textContent || "Notes"
-          console.log("Found recipient:", currentRecipient.value)
+          console.log("TCL ~ Found recipient:", currentRecipient.value)
         } else {
-          console.log("No header element found, using default recipient")
+          console.log("TCL ~ No header element found, using default recipient")
         }
       } catch (error) {
         console.error("Error getting chat name:", error)
@@ -53,7 +53,7 @@ export default defineComponent({
 
       // Show calendar modal
       console.log(
-        "Opening calendar modal for recipient:",
+        "TCL ~ Opening calendar modal for recipient:",
         currentRecipient.value
       )
       showCalendar.value = true

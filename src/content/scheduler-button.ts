@@ -26,7 +26,7 @@ interface MessageData {
 
 // Refactored the function to improve readability and maintainability
 async function sendWhatsAppMessage({ recipient, message }: MessageData) {
-  console.log(`Sending scheduled message to ${recipient}`)
+  console.log(`TCL ~ Sending scheduled message to ${recipient}`)
 
   try {
     // Step 1: Locate and interact with the search box
@@ -68,7 +68,7 @@ async function sendWhatsAppMessage({ recipient, message }: MessageData) {
     if (!sendButton) throw new Error("Send button not found")
 
     fireEvent.click(sendButton)
-    console.log("Message sent successfully!")
+    console.log("TCL ~ Message sent successfully!")
 
     return Promise.resolve(true)
   } catch (error) {
