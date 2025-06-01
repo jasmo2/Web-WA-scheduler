@@ -32,7 +32,7 @@
         "https://web.whatsapp.com/*"
       ],
       "js": [
-        "src/content/scheduler-button.js"
+        "src/content/scheduler-button.ts"
       ]
     }
   ],

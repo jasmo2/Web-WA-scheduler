@@ -148,14 +148,48 @@ export default defineComponent({
       try {
         isScheduling.value = true
 
+        // Parse 12-hour format time (e.g., "12:44 PM")
+        const timeMatch = selectedTime.value.match(
+          /(\d{1,2}):(\d{2})\s*(AM|PM)/i
+        )
+        if (!timeMatch) {
+          alert("Invalid time format.")
+          isScheduling.value = false
+          return
+        }
+
+        let hours = parseInt(timeMatch[1], 10)
+        const minutes = parseInt(timeMatch[2], 10)
+        const period = timeMatch[3].toUpperCase()
+
+        // Convert to 24-hour format
+        if (period === "AM" && hours === 12) {
+          hours = 0 // 12:xx AM becomes 0:xx
+        } else if (period === "PM" && hours !== 12) {
+          hours += 12 // 1:xx PM becomes 13:xx, but 12:xx PM stays 12:xx
+        }
+
         // Combine date and time
-        const [hours, minutes] = selectedTime.value.split(":").map(Number)
         const scheduledDateTime = new Date(selectedDate.value)
         scheduledDateTime.setHours(hours, minutes, 0, 0)
+
+        console.log("Parsed time:", {
+          original: selectedTime.value,
+          hours,
+          minutes,
+          period,
+          scheduledDateTime: scheduledDateTime.toLocaleString(),
+        })
 
         // Ensure the scheduled time is in the future
         const now = new Date()
         if (scheduledDateTime <= now) {
+          console.log(
+            "TCL ~ scheduleMessage ~ scheduledDateTime:",
+            scheduledDateTime,
+            "now",
+            now
+          )
           alert("Please select a future date and time.")
           isScheduling.value = false
           return
@@ -171,6 +205,7 @@ export default defineComponent({
           },
         })
 
+        console.log("Schedule response:", response)
         if (response.success) {
           alert(`Message scheduled for ${scheduledDateTime.toLocaleString()}`)
           emit("close")
