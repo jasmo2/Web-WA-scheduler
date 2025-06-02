@@ -207,7 +207,8 @@ export default defineComponent({
         )
         console.log(
           "TCL ~ Final scheduled timestamp:",
-          scheduledDateTime.getTime()
+          scheduledDateTime.getTime(),
+          "\n----------\n----------\n----------\n----------\n----------\n----------\n----------\n----------"
         )
 
         // Ensure the scheduled time is in the future
